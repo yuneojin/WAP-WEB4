@@ -1,23 +1,17 @@
 import React from "react";
-import "./App.css";
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Login from "./components/login.component";
-import SignUp from "./components/signup.component";
+import Home from "./components/Home";
+import Login from "./components/SignIn";
+import SignUp from "./components/SignUp";
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <div className="auth-wrapper">
-          <div className="auth-inner">
-            <Routes>
-              <Route path="/sign-in" element={<Login />} />
-              <Route path="/sign-up" element={<SignUp />} />
-            </Routes>
-          </div>
-        </div>
-      </div>
+      <Routes>
+        <Route className="home" path="/" element={<Home />} />
+        <Route path="/sign-in" element={<Login />} />
+        <Route path="/sign-up" element={<SignUp />} />
+      </Routes>
     </Router>
   );
 }
