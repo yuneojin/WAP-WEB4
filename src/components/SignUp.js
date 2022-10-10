@@ -29,7 +29,7 @@ const SignUp = () => {
   return (
     <form className=" auth-wrapper">
       <form onSubmit={onSubmit} className="box-shape auth-inner">
-        <h3>WEB4</h3>
+        <h2>WEB4</h2>
         <div className="mb-3 ">
           <input
             className="write-btn size-full pd-3"
