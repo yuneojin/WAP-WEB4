@@ -19,6 +19,7 @@ function Sidebarheader() {
         <img id = "loginIcon" src={login}/>
         <a href="/login">로그인</a>
       </div>
+      
       <div id="mypage">
         <img id = "mypageIcon" src={mypage}/>
         <a href="/mypage">마이페이지</a>
