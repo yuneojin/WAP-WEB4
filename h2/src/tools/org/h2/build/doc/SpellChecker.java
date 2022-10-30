@@ -1,12 +1,23 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build.doc;
 
+<<<<<<< Updated upstream
 import java.io.File;
 import java.io.IOException;
+=======
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+>>>>>>> Stashed changes
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,8 +46,12 @@ public class SpellChecker {
     private static final String DELIMITERS =
             " \n.();-\"=,*/{}_<>+\r:'@[]&\\!#|?$^%~`\t";
     private static final String PREFIX_IGNORE = "abc";
+<<<<<<< Updated upstream
     private static final String[] IGNORE_FILES = { "mainWeb.html",
             "pg_catalog.sql" };
+=======
+    private static final String[] IGNORE_FILES = { "mainWeb.html" };
+>>>>>>> Stashed changes
 
     // These are public so we can set them during development testing
 
@@ -72,8 +87,13 @@ public class SpellChecker {
     }
 
     private void run(String dictionaryFileName, String dir) throws IOException {
+<<<<<<< Updated upstream
         process(new File(dictionaryFileName));
         process(new File(dir));
+=======
+        process(Paths.get(dictionaryFileName));
+        process(Paths.get(dir));
+>>>>>>> Stashed changes
         HashSet<String> unused = new HashSet<>();
         unused.addAll(dictionary);
         unused.removeAll(used);
@@ -113,20 +133,34 @@ public class SpellChecker {
         }
     }
 
+<<<<<<< Updated upstream
     private void process(File file) throws IOException {
         String name = file.getName();
+=======
+    private void process(Path file) throws IOException {
+        String name = file.getFileName().toString();
+>>>>>>> Stashed changes
         if (name.endsWith(".svn") || name.endsWith(".DS_Store")) {
             return;
         }
         if (name.startsWith("_") && name.indexOf("_en") < 0) {
             return;
         }
+<<<<<<< Updated upstream
         if (file.isDirectory()) {
             for (File f : file.listFiles()) {
                 process(f);
             }
         } else {
             String fileName = file.getAbsolutePath();
+=======
+        if (Files.isDirectory(file)) {
+            for (Path f : Files.newDirectoryStream(file)) {
+                process(f);
+            }
+        } else {
+            String fileName = file.toAbsolutePath().toString();
+>>>>>>> Stashed changes
             int idx = fileName.lastIndexOf('.');
             String suffix;
             if (idx < 0) {
@@ -183,10 +217,14 @@ public class SpellChecker {
                 System.out.println();
             }
         }
+<<<<<<< Updated upstream
         if (notFound.isEmpty()) {
             return;
         }
         if (notFound.size() > 0) {
+=======
+        if (!notFound.isEmpty()) {
+>>>>>>> Stashed changes
             System.out.println("file: " + fileName);
             for (String s : notFound) {
                 System.out.print(s + " ");

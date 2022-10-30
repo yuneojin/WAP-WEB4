@@ -1,5 +1,9 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
@@ -7,7 +11,17 @@ package org.h2.build.code;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+<<<<<<< Updated upstream
 import java.io.RandomAccessFile;
+=======
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+>>>>>>> Stashed changes
 import java.util.Arrays;
 
 /**
@@ -20,7 +34,11 @@ public class CheckTextFiles {
     private static final int MAX_SOURCE_LINE_SIZE = 120;
 
     // must contain "+" otherwise this here counts as well
+<<<<<<< Updated upstream
     private static final String COPYRIGHT1 = "Copyright 2004-201";
+=======
+    private static final String COPYRIGHT1 = "Copyright 2004-2022";
+>>>>>>> Stashed changes
     private static final String COPYRIGHT2 = "H2 Group.";
     private static final String LICENSE = "Multiple-Licensed " +
             "under the MPL 2.0";
@@ -57,13 +75,24 @@ public class CheckTextFiles {
     }
 
     private void run() throws Exception {
+<<<<<<< Updated upstream
         String baseDir = "src";
         check(new File(baseDir));
+=======
+        Files.walkFileTree(Paths.get("src"), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                check(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+>>>>>>> Stashed changes
         if (hasError) {
             throw new Exception("Errors found");
         }
     }
 
+<<<<<<< Updated upstream
     private void check(File file) throws Exception {
         String name = file.getName();
         if (file.isDirectory()) {
@@ -112,6 +141,47 @@ public class CheckTextFiles {
                 checkOrFixFile(file, AUTO_FIX, checkLicense);
             }
         }
+=======
+    void check(Path file) throws IOException {
+        String name = file.getFileName().toString();
+        String suffix = "";
+        int lastDot = name.lastIndexOf('.');
+        if (lastDot >= 0) {
+            suffix = name.substring(lastDot + 1);
+        }
+        boolean check = false, ignore = false;
+        for (String s : SUFFIX_CHECK) {
+            if (suffix.equals(s)) {
+                check = true;
+            }
+        }
+        for (String s : SUFFIX_IGNORE) {
+            if (suffix.equals(s)) {
+                ignore = true;
+            }
+        }
+        boolean checkLicense = true;
+        for (String ig : suffixIgnoreLicense) {
+            if (suffix.equals(ig) || name.endsWith(ig)) {
+                checkLicense = false;
+                break;
+            }
+        }
+        if (ignore == check) {
+            throw new RuntimeException("Unknown suffix: " + suffix
+                    + " for file: " + file.toAbsolutePath());
+        }
+        useCRLF = false;
+        for (String s : SUFFIX_CRLF) {
+            if (suffix.equals(s)) {
+                useCRLF = true;
+                break;
+            }
+        }
+        if (check) {
+            checkOrFixFile(file, AUTO_FIX, checkLicense);
+        }
+>>>>>>> Stashed changes
     }
 
     /**
@@ -124,6 +194,7 @@ public class CheckTextFiles {
      * @param fix automatically fix newline characters and trailing spaces
      * @param checkLicense check the license and copyright
      */
+<<<<<<< Updated upstream
     public void checkOrFixFile(File file, boolean fix, boolean checkLicense)
             throws Exception {
         RandomAccessFile in = new RandomAccessFile(file, "r");
@@ -131,6 +202,11 @@ public class CheckTextFiles {
         ByteArrayOutputStream out = fix ? new ByteArrayOutputStream() : null;
         in.readFully(data);
         in.close();
+=======
+    public void checkOrFixFile(Path file, boolean fix, boolean checkLicense) throws IOException {
+        byte[] data = Files.readAllBytes(file);
+        ByteArrayOutputStream out = fix ? new ByteArrayOutputStream() : null;
+>>>>>>> Stashed changes
         if (checkLicense) {
             if (data.length > COPYRIGHT1.length() + LICENSE.length()) {
                 // don't check tiny files
@@ -180,12 +256,23 @@ public class CheckTextFiles {
                     lastWasWhitespace = false;
                     line++;
                     int lineLength = i - startLinePos;
+<<<<<<< Updated upstream
                     if (file.getName().endsWith(".java")) {
+=======
+                    if (file.getFileName().toString().endsWith(".java")) {
+>>>>>>> Stashed changes
                         if (i > 0 && data[i - 1] == '\r') {
                             lineLength--;
                         }
                         if (lineLength > MAX_SOURCE_LINE_SIZE) {
+<<<<<<< Updated upstream
                             fail(file, "line too long: " + lineLength, line);
+=======
+                            String s = new String(data, startLinePos, lineLength).trim();
+                            if (!s.startsWith("// http://") && !s.startsWith("// https://")) {
+                                fail(file, "line too long: " + lineLength, line);
+                            }
+>>>>>>> Stashed changes
                         }
                     }
                     startLinePos = i;
@@ -251,11 +338,16 @@ public class CheckTextFiles {
         if (fix) {
             byte[] changed = out.toByteArray();
             if (!Arrays.equals(data, changed)) {
+<<<<<<< Updated upstream
                 RandomAccessFile f = new RandomAccessFile(file, "rw");
                 f.write(changed);
                 f.setLength(changed.length);
                 f.close();
                 System.out.println("CHANGED: " + file.getName());
+=======
+                Files.write(file, changed);
+                System.out.println("CHANGED: " + file.getFileName());
+>>>>>>> Stashed changes
             }
         }
         line = 1;
@@ -276,11 +368,20 @@ public class CheckTextFiles {
         }
     }
 
+<<<<<<< Updated upstream
     private void fail(File file, String error, int line) {
         if (line <= 0) {
             line = 1;
         }
         String name = file.getAbsolutePath();
+=======
+    private void fail(Path file, String error, int line) {
+        file = file.toAbsolutePath();
+        if (line <= 0) {
+            line = 1;
+        }
+        String name = file.toString();
+>>>>>>> Stashed changes
         int idx = name.lastIndexOf(File.separatorChar);
         if (idx >= 0) {
             name = name.replace(File.separatorChar, '.');
@@ -290,8 +391,12 @@ public class CheckTextFiles {
                 name = name.substring(idx);
             }
         }
+<<<<<<< Updated upstream
         System.out.println("FAIL at " + name + " " + error + " "
                 + file.getAbsolutePath());
+=======
+        System.out.println("FAIL at " + name + " " + error + " " + file.toAbsolutePath());
+>>>>>>> Stashed changes
         hasError = true;
         if (failOnError) {
             throw new RuntimeException("FAIL");

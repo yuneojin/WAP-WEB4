@@ -1,16 +1,33 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build.doc;
 
+<<<<<<< Updated upstream
 import java.io.File;
 import java.io.FileReader;
 import java.util.Stack;
 
 import org.h2.util.IOUtils;
 
+=======
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Stack;
+
+>>>>>>> Stashed changes
 /**
  * This class checks that the HTML and XML part of the source code
  * is well-formed XML.
@@ -24,6 +41,7 @@ public class XMLChecker {
      * @param args the command line parameters
      */
     public static void main(String... args) throws Exception {
+<<<<<<< Updated upstream
         new XMLChecker().run(args);
     }
 
@@ -53,6 +71,48 @@ public class XMLChecker {
     }
 
     private static void processFile(String fileName) throws Exception {
+=======
+        XMLChecker.run(args);
+    }
+
+    private static void run(String... args) throws Exception {
+        Path dir = Paths.get(".");
+        for (int i = 0; i < args.length; i++) {
+            if ("-dir".equals(args[i])) {
+                dir = Paths.get(args[++i]);
+            }
+        }
+        process(dir.resolve("src"));
+        process(dir.resolve("docs"));
+    }
+
+    private static void process(Path path) throws Exception {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                // For Javadoc 8
+                if (dir.getFileName().toString().equals("javadoc")) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                processFile(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    /**
+     * Process a file.
+     *
+     * @param file the file
+     */
+    static void processFile(Path file) throws IOException {
+        String fileName = file.getFileName().toString();
+>>>>>>> Stashed changes
         int idx = fileName.lastIndexOf('.');
         if (idx < 0) {
             return;
@@ -62,8 +122,12 @@ public class XMLChecker {
             return;
         }
         // System.out.println("Checking file:" + fileName);
+<<<<<<< Updated upstream
         FileReader reader = new FileReader(fileName);
         String s = IOUtils.readStringAndClose(reader, -1);
+=======
+        String s = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+>>>>>>> Stashed changes
         Exception last = null;
         try {
             checkXML(s, !suffix.equals("xml"));
@@ -80,16 +144,28 @@ public class XMLChecker {
         // String lastElement = null;
         // <li>: replace <li>([^\r]*[^<]*) with <li>$1</li>
         // use this for html file, for example if <li> is not closed
+<<<<<<< Updated upstream
         String[] noClose = {};
         XMLParser parser = new XMLParser(xml);
         Stack<Object[]> stack = new Stack<>();
         boolean rootElement = false;
         while (true) {
+=======
+        String[] noClose = {"br", "hr", "input", "link", "meta", "wbr"};
+        XMLParser parser = new XMLParser(xml);
+        Stack<Object[]> stack = new Stack<>();
+        boolean rootElement = false;
+        loop: for (;;) {
+>>>>>>> Stashed changes
             int event = parser.next();
             if (event == XMLParser.END_DOCUMENT) {
                 break;
             } else if (event == XMLParser.START_ELEMENT) {
+<<<<<<< Updated upstream
                 if (stack.size() == 0) {
+=======
+                if (stack.isEmpty()) {
+>>>>>>> Stashed changes
                     if (rootElement) {
                         throw new Exception("Second root element at " + parser.getRemaining());
                     }
@@ -112,8 +188,12 @@ public class XMLChecker {
                 if (html) {
                     for (String n : noClose) {
                         if (name.equals(n)) {
+<<<<<<< Updated upstream
                             throw new Exception("Unnecessary closing element "
                                     + name + " at " + parser.getRemaining());
+=======
+                            continue loop;
+>>>>>>> Stashed changes
                         }
                     }
                 }
@@ -141,7 +221,11 @@ public class XMLChecker {
                         + parser.getRemaining());
             }
         }
+<<<<<<< Updated upstream
         if (stack.size() != 0) {
+=======
+        if (!stack.isEmpty()) {
+>>>>>>> Stashed changes
             throw new Exception("Unclosed root element");
         }
     }

@@ -1,21 +1,41 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
 package org.h2.build.doc;
 
 import java.io.File;
+<<<<<<< Updated upstream
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+=======
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+>>>>>>> Stashed changes
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 import org.h2.tools.Server;
+<<<<<<< Updated upstream
 import org.h2.util.IOUtils;
+=======
+>>>>>>> Stashed changes
 import org.h2.util.StringUtils;
 
 /**
@@ -37,10 +57,24 @@ public class LinkChecker {
         "#functions_index",
         "#functions_aggregate_index",
         "#functions_window_index",
+<<<<<<< Updated upstream
         "#tutorial_index"
     };
 
     private final HashMap<String, String> targets = new HashMap<>();
+=======
+        "#tutorial_index",
+        "docs/javadoc/"
+    };
+
+    private static enum TargetKind {
+        FILE, ID
+    }
+    private final HashMap<String, TargetKind> targets = new HashMap<>();
+    /**
+     * Map of source link (i.e. <a> tag) in the document, to the document path
+     */
+>>>>>>> Stashed changes
     private final HashMap<String, String> links = new HashMap<>();
 
     /**
@@ -54,10 +88,17 @@ public class LinkChecker {
     }
 
     private void run(String... args) throws Exception {
+<<<<<<< Updated upstream
         String dir = "docs";
         for (int i = 0; i < args.length; i++) {
             if ("-dir".equals(args[i])) {
                 dir = args[++i];
+=======
+        Path dir = Paths.get("docs");
+        for (int i = 0; i < args.length; i++) {
+            if ("-dir".equals(args[i])) {
+                dir = Paths.get(args[++i]);
+>>>>>>> Stashed changes
             }
         }
         process(dir);
@@ -126,7 +167,12 @@ public class LinkChecker {
     private void listBadLinks() throws Exception {
         ArrayList<String> errors = new ArrayList<>();
         for (String link : links.keySet()) {
+<<<<<<< Updated upstream
             if (!link.startsWith("http") && !link.endsWith("h2.pdf")) {
+=======
+            if (!link.startsWith("http") && !link.endsWith("h2.pdf")
+                    && /* For Javadoc 8 */ !link.startsWith("docs/javadoc")) {
+>>>>>>> Stashed changes
                 if (targets.get(link) == null) {
                     errors.add(links.get(link) + ": Link missing " + link);
                 }
@@ -138,7 +184,11 @@ public class LinkChecker {
             }
         }
         for (String name : targets.keySet()) {
+<<<<<<< Updated upstream
             if (targets.get(name).equals("id")) {
+=======
+            if (targets.get(name) == TargetKind.ID) {
+>>>>>>> Stashed changes
                 boolean ignore = false;
                 for (String to : IGNORE_MISSING_LINKS_TO) {
                     if (name.contains(to)) {
@@ -155,11 +205,16 @@ public class LinkChecker {
         for (String error : errors) {
             System.out.println(error);
         }
+<<<<<<< Updated upstream
         if (errors.size() > 0) {
+=======
+        if (!errors.isEmpty()) {
+>>>>>>> Stashed changes
             throw new Exception("Problems where found by the Link Checker");
         }
     }
 
+<<<<<<< Updated upstream
     private void process(String path) throws Exception {
         if (path.endsWith("/CVS") || path.endsWith("/.svn")) {
             return;
@@ -183,6 +238,34 @@ public class LinkChecker {
         String fileName = new File(path).getName();
         String parent = path.substring(0, path.lastIndexOf('/'));
         String html = IOUtils.readStringAndClose(new FileReader(path), -1);
+=======
+    private void process(Path path) throws Exception {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                processFile(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    /**
+     * Process a file.
+     *
+     * @param file the file
+     */
+    void processFile(Path file) throws IOException {
+        String path = file.toString();
+        targets.put(path, TargetKind.FILE);
+        String fileName = file.getFileName().toString();
+        String lower = StringUtils.toLowerEnglish(fileName);
+        if (!lower.endsWith(".html") && !lower.endsWith(".htm")) {
+            return;
+        }
+        Path parent = file.getParent();
+        final String html = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        // find all the target fragments in the document (those elements marked with id attribute)
+>>>>>>> Stashed changes
         int idx = -1;
         while (true) {
             idx = html.indexOf(" id=\"", idx + 1);
@@ -196,9 +279,17 @@ public class LinkChecker {
             }
             String ref = html.substring(start, end);
             if (!ref.startsWith("_")) {
+<<<<<<< Updated upstream
                 targets.put(path + "#" + ref, "id");
             }
         }
+=======
+                targets.put(path + "#" + ref.replaceAll("%3C|&lt;", "<").replaceAll("%3E|&gt;", ">"), //
+                        TargetKind.ID);
+            }
+        }
+        // find all the href links in the document
+>>>>>>> Stashed changes
         idx = -1;
         while (true) {
             idx = html.indexOf(" href=\"", idx + 1);
@@ -225,12 +316,17 @@ public class LinkChecker {
             } else if (ref.startsWith("#")) {
                 ref = path + ref;
             } else {
+<<<<<<< Updated upstream
                 String p = parent;
+=======
+                Path p = parent;
+>>>>>>> Stashed changes
                 while (ref.startsWith(".")) {
                     if (ref.startsWith("./")) {
                         ref = ref.substring(2);
                     } else if (ref.startsWith("../")) {
                         ref = ref.substring(3);
+<<<<<<< Updated upstream
                         p = p.substring(0, p.lastIndexOf('/'));
                     }
                 }
@@ -238,6 +334,18 @@ public class LinkChecker {
             }
             if (ref != null) {
                 links.put(ref, path);
+=======
+                        p = p.getParent();
+                    }
+                }
+                ref = p + File.separator + ref;
+            }
+            if (ref != null) {
+                links.put(ref.replace('/', File.separatorChar) //
+                        .replaceAll("%5B", "[").replaceAll("%5D", "]") //
+                        .replaceAll("%3C", "<").replaceAll("%3E", ">"), //
+                        path);
+>>>>>>> Stashed changes
             }
         }
         idx = -1;
@@ -263,8 +371,14 @@ public class LinkChecker {
             if (type.equals("href")) {
                 // already checked
             } else if (type.equals("id")) {
+<<<<<<< Updated upstream
                 targets.put(path + "#" + ref, "id");
             } else {
+=======
+                // For Javadoc 8
+                targets.put(path + "#" + ref, TargetKind.ID);
+            } else if (!type.equals("name")) {
+>>>>>>> Stashed changes
                 error(fileName, "Unsupported <a ?: " + html.substring(idx, idx + 100));
             }
         }

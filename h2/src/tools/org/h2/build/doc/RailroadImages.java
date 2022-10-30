@@ -1,5 +1,9 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
@@ -10,8 +14,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+<<<<<<< Updated upstream
 import java.io.File;
 import java.io.IOException;
+=======
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+>>>>>>> Stashed changes
 import javax.imageio.ImageIO;
 
 /**
@@ -24,26 +37,45 @@ public class RailroadImages {
     private static final int DIV = 2;
     private static final int STROKE = 6;
 
+<<<<<<< Updated upstream
     private String outDir;
+=======
+    private Path outDir;
+>>>>>>> Stashed changes
 
     /**
      * This method is called when executing this application from the command
      * line.
      *
      * @param args the command line parameters
+<<<<<<< Updated upstream
      */
     public static void main(String... args) {
         new RailroadImages().run("docs/html/images");
+=======
+     * @throws IOException on I/O exception
+     */
+    public static void main(String... args) throws IOException {
+        new RailroadImages().run(Paths.get("docs/html/images"));
+>>>>>>> Stashed changes
     }
 
     /**
      * Create the images.
      *
      * @param out the target directory
+<<<<<<< Updated upstream
      */
     void run(String out) {
         this.outDir = out;
         new File(out).mkdirs();
+=======
+     * @throws IOException on I/O exception
+     */
+    void run(Path out) throws IOException {
+        this.outDir = out;
+        Files.createDirectories(outDir);
+>>>>>>> Stashed changes
         BufferedImage img;
         Graphics2D g;
 
@@ -111,8 +143,13 @@ public class RailroadImages {
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.drawImage(img, 0, 0, w / DIV, h / DIV, 0, 0, w, h, null);
         g.dispose();
+<<<<<<< Updated upstream
         try {
             ImageIO.write(smaller, "png", new File(outDir + "/" + fileName));
+=======
+        try (OutputStream out = Files.newOutputStream(outDir.resolve(fileName))) {
+            ImageIO.write(smaller, "png", out);
+>>>>>>> Stashed changes
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

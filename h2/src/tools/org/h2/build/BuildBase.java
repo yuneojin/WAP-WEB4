@@ -1,5 +1,9 @@
 /*
+<<<<<<< Updated upstream
  * Copyright 2004-2019 H2 Group. Multiple-Licensed under the MPL 2.0,
+=======
+ * Copyright 2004-2022 H2 Group. Multiple-Licensed under the MPL 2.0,
+>>>>>>> Stashed changes
  * and the EPL 1.0 (https://h2database.com/html/license.html).
  * Initial Developer: H2 Group
  */
@@ -10,14 +14,20 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+<<<<<<< Updated upstream
 import java.io.FileOutputStream;
+=======
+>>>>>>> Stashed changes
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+<<<<<<< Updated upstream
 import java.io.RandomAccessFile;
+=======
+>>>>>>> Stashed changes
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,11 +39,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+<<<<<<< Updated upstream
+=======
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+>>>>>>> Stashed changes
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+<<<<<<< Updated upstream
 import java.util.Collections;
+=======
+>>>>>>> Stashed changes
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -105,7 +128,11 @@ public class BuildBase {
     /**
      * A list of files.
      */
+<<<<<<< Updated upstream
     public static class FileList extends ArrayList<File> {
+=======
+    public static class FileList extends ArrayList<Path> {
+>>>>>>> Stashed changes
 
         private static final long serialVersionUID = 1L;
 
@@ -154,8 +181,13 @@ public class BuildBase {
             // normalize / and \
             pattern = BuildBase.replaceAll(pattern, "/", File.separator);
             FileList list = new FileList();
+<<<<<<< Updated upstream
             for (File f : this) {
                 String path = f.getPath();
+=======
+            for (Path f : this) {
+                String path = f.toString();
+>>>>>>> Stashed changes
                 boolean match = start ? path.startsWith(pattern) : path.endsWith(pattern);
                 if (match == keep) {
                     list.add(f);
@@ -304,12 +336,16 @@ public class BuildBase {
      */
     protected void projectHelp() {
         Method[] methods = getClass().getDeclaredMethods();
+<<<<<<< Updated upstream
         Arrays.sort(methods, new Comparator<Method>() {
             @Override
             public int compare(Method a, Method b) {
                 return a.getName().compareTo(b.getName());
             }
         });
+=======
+        Arrays.sort(methods, Comparator.comparing(Method::getName));
+>>>>>>> Stashed changes
         sysOut.println("Targets:");
         String description;
         for (Method m : methods) {
@@ -328,7 +364,11 @@ public class BuildBase {
         sysOut.println();
     }
 
+<<<<<<< Updated upstream
     private static boolean isWindows() {
+=======
+    protected static boolean isWindows() {
+>>>>>>> Stashed changes
         return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
@@ -437,6 +477,7 @@ public class BuildBase {
     }
 
     /**
+<<<<<<< Updated upstream
      * Reads the value from a static method of a class using reflection.
      *
      * @param className the name of the class
@@ -455,6 +496,8 @@ public class BuildBase {
     }
 
     /**
+=======
+>>>>>>> Stashed changes
      * Copy files to the specified target directory.
      *
      * @param targetDir the target directory
@@ -462,6 +505,7 @@ public class BuildBase {
      * @param baseDir the base directory
      */
     protected void copy(String targetDir, FileList files, String baseDir) {
+<<<<<<< Updated upstream
         File target = new File(targetDir);
         File base = new File(baseDir);
         println("Copying " + files.size() + " files to " + target.getPath());
@@ -470,6 +514,15 @@ public class BuildBase {
             File t = new File(target, removeBase(basePath, f.getPath()));
             byte[] data = readFile(f);
             mkdirs(t.getParentFile());
+=======
+        Path target = Paths.get(targetDir);
+        Path base = Paths.get(baseDir);
+        println("Copying " + files.size() + " files to " + target);
+        for (Path f : files) {
+            Path t = target.resolve(base.relativize(f));
+            byte[] data = readFile(f);
+            mkdirs(t.getParent());
+>>>>>>> Stashed changes
             writeFile(t, data);
         }
     }
@@ -542,7 +595,16 @@ public class BuildBase {
                         "Generating ",
                 }));
             }
+<<<<<<< Updated upstream
             Class<?> clazz = Class.forName("com.sun.tools.javadoc.Main");
+=======
+            Class<?> clazz;
+            try {
+                clazz = Class.forName("jdk.javadoc.internal.tool.Main");
+            } catch (Exception e) {
+                clazz = Class.forName("com.sun.tools.javadoc.Main");
+            }
+>>>>>>> Stashed changes
             Method execute = clazz.getMethod("execute", String[].class);
             result = (Integer) invoke(execute, null, new Object[] { args });
         } catch (Exception e) {
@@ -594,18 +656,32 @@ public class BuildBase {
      */
     protected void downloadUsingMaven(String target, String group,
             String artifact, String version, String sha1Checksum) {
+<<<<<<< Updated upstream
         String repoDir = "http://repo1.maven.org/maven2";
         File targetFile = new File(target);
         if (targetFile.exists()) {
+=======
+        String repoDir = "https://repo1.maven.org/maven2";
+        Path targetFile = Paths.get(target);
+        if (Files.exists(targetFile)) {
+>>>>>>> Stashed changes
             return;
         }
         String repoFile = group.replace('.', '/') + "/" + artifact + "/" + version + "/"
                 + artifact + "-" + version + ".jar";
+<<<<<<< Updated upstream
         mkdirs(targetFile.getAbsoluteFile().getParentFile());
         String localMavenDir = getLocalMavenDir();
         if (new File(localMavenDir).exists()) {
             File f = new File(localMavenDir, repoFile);
             if (!f.exists()) {
+=======
+        mkdirs(targetFile.toAbsolutePath().getParent());
+        Path localMavenDir = Paths.get(getLocalMavenDir());
+        if (Files.isDirectory(localMavenDir)) {
+            Path f = localMavenDir.resolve(repoFile);
+            if (!Files.exists(f)) {
+>>>>>>> Stashed changes
                 try {
                     execScript("mvn", args(
                             "org.apache.maven.plugins:maven-dependency-plugin:2.1:get",
@@ -615,7 +691,11 @@ public class BuildBase {
                     println("Could not download using Maven: " + e.toString());
                 }
             }
+<<<<<<< Updated upstream
             if (f.exists()) {
+=======
+            if (Files.exists(f)) {
+>>>>>>> Stashed changes
                 byte[] data = readFile(f);
                 String got = getSHA1(data);
                 if (sha1Checksum == null) {
@@ -625,7 +705,11 @@ public class BuildBase {
                         throw new RuntimeException(
                                 "SHA1 checksum mismatch; got: " + got +
                                         " expected: " + sha1Checksum +
+<<<<<<< Updated upstream
                                         " for file " + f.getAbsolutePath());
+=======
+                                        " for file " + f.toAbsolutePath());
+>>>>>>> Stashed changes
                     }
                 }
                 writeFile(targetFile, data);
@@ -650,11 +734,19 @@ public class BuildBase {
      * @param sha1Checksum the SHA-1 checksum or null
      */
     protected void download(String target, String fileURL, String sha1Checksum) {
+<<<<<<< Updated upstream
         File targetFile = new File(target);
         if (targetFile.exists()) {
             return;
         }
         mkdirs(targetFile.getAbsoluteFile().getParentFile());
+=======
+        Path targetFile = Paths.get(target);
+        if (Files.exists(targetFile)) {
+            return;
+        }
+        mkdirs(targetFile.toAbsolutePath().getParent());
+>>>>>>> Stashed changes
         ByteArrayOutputStream buff = new ByteArrayOutputStream();
         try {
             println("Downloading " + fileURL);
@@ -664,7 +756,11 @@ public class BuildBase {
             int len = 0;
             while (true) {
                 long now = System.nanoTime();
+<<<<<<< Updated upstream
                 if (now > last + TimeUnit.SECONDS.toNanos(1)) {
+=======
+                if (now - last > 1_000_000_000L) {
+>>>>>>> Stashed changes
                     println("Downloaded " + len + " bytes");
                     last = now;
                 }
@@ -701,7 +797,11 @@ public class BuildBase {
      */
     protected FileList files(String dir) {
         FileList list = new FileList();
+<<<<<<< Updated upstream
         addFiles(list, new File(dir));
+=======
+        addFiles(list, Paths.get(dir));
+>>>>>>> Stashed changes
         return list;
     }
 
@@ -715,6 +815,7 @@ public class BuildBase {
         return new StringList(args);
     }
 
+<<<<<<< Updated upstream
     private void addFiles(FileList list, File file) {
         if (file.getName().startsWith(".svn")) {
             // ignore
@@ -722,12 +823,29 @@ public class BuildBase {
             String path = file.getPath();
             for (String fileName : file.list()) {
                 addFiles(list, new File(path, fileName));
+=======
+    private static void addFiles(FileList list, Path file) {
+        if (file.getFileName().toString().startsWith(".svn")) {
+            // ignore
+        } else if (Files.isDirectory(file)) {
+            try {
+                Files.walkFileTree(file, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        list.add(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading directory " + file, e);
+>>>>>>> Stashed changes
             }
         } else {
             list.add(file);
         }
     }
 
+<<<<<<< Updated upstream
     private static String removeBase(String basePath, String path) {
         if (path.startsWith(basePath)) {
             path = path.substring(basePath.length());
@@ -739,18 +857,26 @@ public class BuildBase {
         return path;
     }
 
+=======
+>>>>>>> Stashed changes
     /**
      * Create or overwrite a file.
      *
      * @param file the file
      * @param data the data to write
      */
+<<<<<<< Updated upstream
     public static void writeFile(File file, byte[] data) {
         try {
             RandomAccessFile ra = new RandomAccessFile(file, "rw");
             ra.write(data);
             ra.setLength(data.length);
             ra.close();
+=======
+    public static void writeFile(Path file, byte[] data) {
+        try {
+            Files.write(file, data);
+>>>>>>> Stashed changes
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file " + file, e);
         }
@@ -762,6 +888,7 @@ public class BuildBase {
      * @param file the file
      * @return the data
      */
+<<<<<<< Updated upstream
     public static byte[] readFile(File file) {
         RandomAccessFile ra = null;
         try {
@@ -784,6 +911,13 @@ public class BuildBase {
                     // ignore
                 }
             }
+=======
+    public static byte[] readFile(Path file) {
+        try {
+            return Files.readAllBytes(file);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading from file " + file, e);
+>>>>>>> Stashed changes
         }
     }
 
@@ -831,6 +965,7 @@ public class BuildBase {
             String basePath, boolean storeOnly, boolean sortBySuffix, boolean jar) {
         if (sortBySuffix) {
             // for better compressibility, sort by suffix, then name
+<<<<<<< Updated upstream
             Collections.sort(files, new Comparator<File>() {
                 @Override
                 public int compare(File f1, File f2) {
@@ -845,6 +980,19 @@ public class BuildBase {
             });
         } else if (jar) {
             Collections.sort(files, new Comparator<File>() {
+=======
+            files.sort((f1, f2) -> {
+                String p1 = f1.toString();
+                String p2 = f2.toString();
+                int comp = getSuffix(p1).compareTo(getSuffix(p2));
+                if (comp == 0) {
+                    comp = p1.compareTo(p2);
+                }
+                return comp;
+            });
+        } else if (jar) {
+            files.sort(new Comparator<Path>() {
+>>>>>>> Stashed changes
                 private int priority(String path) {
                     if (path.startsWith("META-INF/")) {
                         if (path.equals("META-INF/MANIFEST.MF")) {
@@ -862,9 +1010,15 @@ public class BuildBase {
                 }
 
                 @Override
+<<<<<<< Updated upstream
                 public int compare(File f1, File f2) {
                     String p1 = f1.getPath();
                     String p2 = f2.getPath();
+=======
+                public int compare(Path f1, Path f2) {
+                    String p1 = f1.toString();
+                    String p2 = f2.toString();
+>>>>>>> Stashed changes
                     int comp = Integer.compare(priority(p1), priority(p2));
                     if (comp != 0) {
                         return comp;
@@ -873,16 +1027,28 @@ public class BuildBase {
                 }
             });
         }
+<<<<<<< Updated upstream
         mkdirs(new File(destFile).getAbsoluteFile().getParentFile());
         // normalize the path (replace / with \ if required)
         basePath = new File(basePath).getPath();
         try {
             if (new File(destFile).isDirectory()) {
+=======
+        Path dest = Paths.get(destFile).toAbsolutePath();
+        mkdirs(dest.getParent());
+        Path base = Paths.get(basePath);
+        try {
+            if (Files.isDirectory(dest)) {
+>>>>>>> Stashed changes
                 throw new IOException(
                         "Can't create the file as a directory with this name already exists: "
                                 + destFile);
             }
+<<<<<<< Updated upstream
             OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+=======
+            OutputStream out = new BufferedOutputStream(Files.newOutputStream(dest));
+>>>>>>> Stashed changes
             ZipOutputStream zipOut;
             if (jar) {
                 zipOut = new JarOutputStream(out);
@@ -893,14 +1059,23 @@ public class BuildBase {
                 zipOut.setMethod(ZipOutputStream.STORED);
             }
             zipOut.setLevel(Deflater.BEST_COMPRESSION);
+<<<<<<< Updated upstream
             for (File file : files) {
                 String fileName = file.getPath();
                 String entryName = removeBase(basePath, fileName);
+=======
+            for (Path file : files) {
+                String entryName = base.relativize(file).toString().replace('\\', '/');
+>>>>>>> Stashed changes
                 byte[] data = readFile(file);
                 ZipEntry entry = new ZipEntry(entryName);
                 CRC32 crc = new CRC32();
                 crc.update(data);
+<<<<<<< Updated upstream
                 entry.setSize(file.length());
+=======
+                entry.setSize(data.length);
+>>>>>>> Stashed changes
                 entry.setCrc(crc.getValue());
                 zipOut.putNextEntry(entry);
                 zipOut.write(data);
@@ -908,14 +1083,22 @@ public class BuildBase {
             }
             zipOut.closeEntry();
             zipOut.close();
+<<<<<<< Updated upstream
             return new File(destFile).length() / 1024;
+=======
+            return Files.size(dest) / 1024;
+>>>>>>> Stashed changes
         } catch (IOException e) {
             throw new RuntimeException("Error creating file " + destFile, e);
         }
     }
 
     /**
+<<<<<<< Updated upstream
      * Get the current java specification version (for example, 1.4).
+=======
+     * Get the current java specification version (for example, 1.8).
+>>>>>>> Stashed changes
      *
      * @return the java specification version
      */
@@ -926,15 +1109,26 @@ public class BuildBase {
     /**
      * Get the current Java version as integer value.
      *
+<<<<<<< Updated upstream
      * @return the Java version (7, 8, 9, 10, 11, etc)
      */
     public static int getJavaVersion() {
         int version = 7;
+=======
+     * @return the Java version (8, 9, 10, 11, 12, 13, etc)
+     */
+    public static int getJavaVersion() {
+        int version = 8;
+>>>>>>> Stashed changes
         String v = getJavaSpecVersion();
         if (v != null) {
             int idx = v.indexOf('.');
             if (idx >= 0) {
+<<<<<<< Updated upstream
                 // 1.7, 1.8
+=======
+                // 1.8
+>>>>>>> Stashed changes
                 v = v.substring(idx + 1);
             }
             version = Integer.parseInt(v);
@@ -944,8 +1138,13 @@ public class BuildBase {
 
     private static List<String> getPaths(FileList files) {
         StringList list = new StringList();
+<<<<<<< Updated upstream
         for (File f : files) {
             list.add(f.getPath());
+=======
+        for (Path f : files) {
+            list.add(f.toString());
+>>>>>>> Stashed changes
         }
         return list;
     }
@@ -1009,6 +1208,7 @@ public class BuildBase {
      * @param dir the directory to create
      */
     protected static void mkdir(String dir) {
+<<<<<<< Updated upstream
         File f = new File(dir);
         if (f.exists()) {
             if (f.isFile()) {
@@ -1025,6 +1225,19 @@ public class BuildBase {
             if (!f.mkdirs()) {
                 throw new RuntimeException("Can not create directory " + f.getAbsolutePath());
             }
+=======
+        mkdirs(Paths.get(dir));
+    }
+
+    private static void mkdirs(Path f) {
+        try {
+            Files.createDirectories(f);
+        } catch (FileAlreadyExistsException e) {
+            throw new RuntimeException("Can not create directory " + e.getFile()
+                    + " because a file with this name exists");
+        } catch (IOException e) {
+            throw new RuntimeException("Can not create directory " + f.toAbsolutePath());
+>>>>>>> Stashed changes
         }
     }
 
@@ -1035,7 +1248,11 @@ public class BuildBase {
      */
     protected void delete(String dir) {
         println("Deleting " + dir);
+<<<<<<< Updated upstream
         delete(new File(dir));
+=======
+        deleteRecursive(Paths.get(dir));
+>>>>>>> Stashed changes
     }
 
     /**
@@ -1044,6 +1261,7 @@ public class BuildBase {
      * @param files the name of the files to delete
      */
     protected void delete(FileList files) {
+<<<<<<< Updated upstream
         for (File f : files) {
             delete(f);
         }
@@ -1059,6 +1277,39 @@ public class BuildBase {
             }
             if (!file.delete()) {
                 throw new RuntimeException("Can not delete " + file.getPath());
+=======
+        for (Path f : files) {
+            deleteRecursive(f);
+        }
+    }
+
+    /**
+     * Delete a file or a directory with its content.
+     *
+     * @param file the file or directory to delete
+     */
+    public static void deleteRecursive(Path file) {
+        if (Files.exists(file)) {
+            try {
+                Files.walkFileTree(file, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        if (exc == null) {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+                        throw exc;
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException("Can not delete " + file);
+>>>>>>> Stashed changes
             }
         }
     }
