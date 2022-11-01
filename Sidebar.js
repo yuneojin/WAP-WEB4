@@ -5,6 +5,7 @@ import baekkyong from "../images/baekkyoung.jpg";
 import login from "../images/login.png";
 import mypage from "../images/mypage.png";
 import "../styles/Sidebar.css";
+import { getNextKeyDef } from "@testing-library/user-event/dist/keyboard/getNextKeyDef";
 
 function Sidebarheader() {
   return (
@@ -41,12 +42,11 @@ function Sidebar() {
   ];
 
   return (
-    <div className="Sidebar">
       <div className="sidebar">
         <Sidebarheader></Sidebarheader>
         {menus.map((menu, index) => {
-          return (
-            <div className="menu">
+          return ( 
+            <div className="menu" key={index}>
               <Link to={menu.path} key={index}>
                 <SidebarItem menu={menu} />
               </Link>
@@ -55,7 +55,6 @@ function Sidebar() {
         })}
         <Baekkyong></Baekkyong>
       </div>
-    </div>
   );
 }
 
