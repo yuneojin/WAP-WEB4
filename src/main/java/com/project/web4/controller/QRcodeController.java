@@ -1,10 +1,13 @@
 package com.project.web4.controller;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
+import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import com.project.web4.domain.QRcode;
+import com.project.web4.service.QrService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +18,10 @@ import java.io.IOException;
 
 @Controller
 public class QRcodeController {
+
+    @Autowired
+    QrService qrService;
+
     @GetMapping("/coupon")
     public String couponPage(){
         return "coupon";
@@ -32,5 +39,11 @@ public class QRcodeController {
                     .contentType(MediaType.IMAGE_PNG)
                     .body(out.toByteArray());
         }
+    }
+
+    @RequestMapping(value = "/buyCoupon", method = RequestMethod.POST)
+    public String buyCoupon(QRcode qrCode){
+        qrService.buy(qrCode);
+        return "coupon";
     }
 }

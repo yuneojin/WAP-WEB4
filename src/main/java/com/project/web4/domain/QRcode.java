@@ -16,7 +16,9 @@ import javax.persistence.Id;
 public class QRcode {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long qrNo;
+    private Long userQRNo;
     private String id;
-    private String qrCode;
+    private String menu;
+    private String corner;
+    private int price;
 }
